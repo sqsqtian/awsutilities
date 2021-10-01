@@ -1,0 +1,114 @@
+screen -XS <session-id> quit
+bitbucket
+source hdk_setup.sh 
+cd ./hdk/cl/developer_designs/
+cd ./cl_fifo/
+
+
+export CL_DIR=$(pwd)
+export EMAIL=shanquan.tian@yale.edu
+cd $CL_DIR/build/scripts
+
+./aws_build_dcp_from_cl.sh -notify
+./aws_build_dcp_from_cl.sh -clock_recipe_b B0 -notify
+
+
+source hdk_setup.sh
+
+cd ./build/checkpoints/to_aws/
+
+aws s3 cp ./XXX.tar s3://cl-shanquan/general/
+
+aws ec2 create-fpga-image --region us-east-1 --name cl-XXX  --input-storage-location Bucket=cl-shanquan,Key=general/XXX.tar --logs-storage-location Bucket=cl-shanquan,Key=test_log
+
+
+aws ec2 describe-fpga-images --fpga-image-ids afi-******
+
+$ aws ec2 --region us-east-1 modify-fpga-image-attribute --fpga-image-id afi-XXXXX --operation-type add --user-ids XXXXX
+
+
+sudo fpga-clear-local-image -S 0
+
+sudo fpga-load-local-image -S 0 -I agfi-*******
+
+aws ec2 describe-fpga-images --filters Name=fpga-image-global-id,Values=XXX
+
+
+$AWS_FPGA_REPO_DIR/Vitis/tools/create_vitis_afi.sh -s3_bucket=cl-shanquan -s3_dcp_key=general -s3_logs_key=test_log -xclbin=../../build/hardware/xilinxvitis/xilinxvitis_1x32_i8w8a32_15_15_18_17/vta_vitis.xclbin
+
+sudo fpga-describe-local-image -S 0 -M | tail
+
+/*
+agfi-0053ddf0f08936a8e //cl dram no flushing
+
+agfi-078074d039e0b02ec // cl fifo test
+
+*/
+
+
+
+If you want to use runtime software to do experiments, you should:
+source sdk_setup.sh first.
+
+
+
+{
+            "UpdateTime": "2018-08-24T12:32:48.000Z", 
+            "Name": "cl-dram", 
+            "Tags": [], 
+            "PciId": {
+                "SubsystemVendorId": "0xfedc", 
+                "VendorId": "0x1d0f", 
+                "DeviceId": "0xf001", 
+                "SubsystemId": "0x1d51"
+            }, 
+            "FpgaImageGlobalId": "agfi-022f1a4e7c84dc3b7", 
+            "Public": false, 
+            "State": {
+                "Code": "available"
+            }, 
+            "ShellVersion": "0x04261818", 
+            "OwnerId": "438680689039", 
+            "FpgaImageId": "afi-070d3e8c635ed6403", 
+            "CreateTime": "2018-08-24T11:48:40.000Z"
+        }, 
+        {
+            "UpdateTime": "2018-10-16T20:04:32.000Z", 
+            "Name": "cl-dram-no-flush", 
+            "Tags": [], 
+            "PciId": {
+                "SubsystemVendorId": "0xfedc", 
+                "VendorId": "0x1d0f", 
+                "DeviceId": "0xf001", 
+                "SubsystemId": "0x1d51"
+            }, 
+            "FpgaImageGlobalId": "agfi-0053ddf0f08936a8e", 
+            "Public": false, 
+            "State": {
+                "Code": "available"
+            }, 
+            "ShellVersion": "0x04261818", 
+            "OwnerId": "438680689039", 
+            "FpgaImageId": "afi-0efbfbab52b2f0bf3", 
+            "CreateTime": "2018-10-16T19:20:53.000Z"
+        }, 
+{
+            "UpdateTime": "2018-08-06T22:12:34.000Z", 
+            "Name": "cl-fifo-test", 
+            "Tags": [], 
+            "PciId": {
+                "SubsystemVendorId": "0xfedd", 
+                "VendorId": "0x1d0f", 
+                "DeviceId": "0xf000", 
+                "SubsystemId": "0x1d51"
+            }, 
+            "FpgaImageGlobalId": "agfi-078074d039e0b02ec", 
+            "Public": false, 
+            "State": {
+                "Code": "available"
+            }, 
+            "ShellVersion": "0x04261818", 
+            "OwnerId": "438680689039", 
+            "FpgaImageId": "afi-042b1ac2c1c946594", 
+            "CreateTime": "2018-08-06T21:35:56.000Z"
+        }, 
