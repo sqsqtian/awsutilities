@@ -52,11 +52,19 @@ def printMyAFIs():
             f.write("%s\n"%(str(e)))
 
 
+def rmOneAFI(afi_tobeRm):
+    cmd='aws ec2 delete-fpga-image --fpga-image-id %s'%(afi_tobeRm)
+    p = subprocess.call(cmd, shell=True)
+
+# aws ec2 describe-fpga-images --filters Name=fpga-image-global-id,Values=agfi-0b66fb1317eb828bb 
+# aws ec2 --region us-east-1 modify-fpga-image-attribute --fpga-image-id afi-0bd8adee508237c3b --operation-type add --user-groups all
+# some command examples: https://github.com/aws/aws-fpga/blob/master/hdk/docs/fpga_image_attributes.md
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Utilities to use AWS FPGAs")
     # parser.add_argument('--choice', action='store_true')
-    parser.add_argument('-c', '--choice', type=int, help="choice 0: countMyAFIs and save AFIs to file; choice 1: clean AFIs; ")
+    parser.add_argument('-c', '--choice', type=int, help="choice 0: countMyAFIs and save AFIs to file; choice 1: clean AFIs; choice 2: remove one AFI")
+    parser.add_argument('--afi', type=str, help="one afi")
     args = parser.parse_args()
 
     if (args.choice == 0):
@@ -64,6 +72,8 @@ if __name__ == "__main__":
         printMyAFIs()
     elif (args.choice == 1):
         cleanMyAFIs()
+    elif (args.choice == 2):
+        rmOneAFI(args.afi)
     else:
         print("Undefined choice!")
         sys.exit(0)
